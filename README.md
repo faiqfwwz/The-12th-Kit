@@ -38,3 +38,22 @@ You can access the web here: [The 12th Kit Web](https://ahmad-faiq41-the12thkit.
 
 8. **Membuat sebuah `README.md` yang berisi tautan menuju aplikasi PWS yang sudah di-*deploy*, serta jawaban dari beberapa pertanyaan berikut.**
    - Terakhir, buat `README.md` yang berisi tautan dan penjelasan dari beberapa pertanyaan.
+
+### Buatlah bagan yang berisi *request client* ke web aplikasi berbasis Django beserta responnya dan jelaskan pada bagan tersebut kaitan antara `urls.py`, `views.py`, `models.py`, dan berkas `html`.
+![Django Flow](https://github-production-user-asset-6210df.s3.amazonaws.com/198147988/486520219-50dfbc8d-e83f-48ad-b15e-9dc4ae6ae421.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250907%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250907T144215Z&X-Amz-Expires=300&X-Amz-Signature=ad77bd07e7ec25e21be080cfc285f568ee2a379d593080458f80ae52ed111105&X-Amz-SignedHeaders=host)
+
+### Jelaskan peran `settings.py` dalam proyek Django!
+
+Dalam proyek Django, `settings.py` berperan sebagai pusat konfigurasi yang mengatur jalannya aplikasi. File ini berisi pengaturan penting seperti `DEBUG`, `ALLOWED_HOSTS`, `INSTALLED_APPS`, `MIDDLEWARE`, serta konfigurasi *database*. Singkatnya, `settings.py` adalah “otak” proyek Django yang mengendalikan hampir semua aspek teknis aplikasi agar dapat berjalan sesuai kebutuhan.
+
+### Bagaimana cara kerja migrasi database di Django?
+
+Migrasi di Django adalah mekanisme sinkronisasi antara model (`models.py`) dengan struktur *database*. Pertama `makemigrations` menciptakan berkas migrasi yang berisi perubahan model yang belum diaplikasikan ke dalam *database*. Lalu `migrate` akan mengaplikasikan perubahan model yang ada di dalam berkas migrasi ke *database*.
+
+### Menurut Anda, dari semua framework yang ada, mengapa framework Django dijadikan permulaan pembelajaran pengembangan perangkat lunak?
+
+Django sering dipakai sebagai permulaan pembelajaran karena mudah, lengkap, dan terstruktur. Django dibuat dengan bahasa Python yang gampang dipahami oleh pemula, *framework* yang sudah menyediakan banyak fitur bawaan sehingga kita bisa fokus ke pengembangan, pola MVT (Model-View-Template) yang terstruktur, serta dokumentasi yang jelas dan komunitas yang besar.
+
+### Apakah ada feedback untuk asisten dosen tutorial 1 yang telah kamu kerjakan sebelumnya?
+
+Tidak ada.
