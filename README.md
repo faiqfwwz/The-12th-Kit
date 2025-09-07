@@ -40,7 +40,7 @@ You can access the web here: [The 12th Kit Web](https://ahmad-faiq41-the12thkit.
    - Terakhir, buat `README.md` yang berisi tautan dan penjelasan dari beberapa pertanyaan.
 
 ### Buatlah bagan yang berisi *request client* ke web aplikasi berbasis Django beserta responnya dan jelaskan pada bagan tersebut kaitan antara `urls.py`, `views.py`, `models.py`, dan berkas `html`.
-![Django Flow](https://github-production-user-asset-6210df.s3.amazonaws.com/198147988/486520219-50dfbc8d-e83f-48ad-b15e-9dc4ae6ae421.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250907%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250907T144215Z&X-Amz-Expires=300&X-Amz-Signature=ad77bd07e7ec25e21be080cfc285f568ee2a379d593080458f80ae52ed111105&X-Amz-SignedHeaders=host)
+![Django Flow](https://github.com/user-attachments/assets/dc4cf68b-9e91-4f61-930c-3f0a1e788d76)
 
 ### Jelaskan peran `settings.py` dalam proyek Django!
 
