@@ -83,3 +83,8 @@ class Product(models.Model):
                 i += 1
             self.slug = unique
         super().save(*args, **kwargs)
+
+class Employee(models.Model):
+    name = models.CharField(max_length=255)#maks 255 
+    age = models.IntegerField() #bil bulat
+    persona = models.TextField() #description
