@@ -34,6 +34,10 @@ DEBUG = True
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "ahmad-faiq41-the12thkit.pbp.cs.ui.ac.id"]
 
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://ahmad-faiq41-the12thkit.pbp.cs.ui.ac.id"
+]
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -61,7 +65,7 @@ ROOT_URLCONF = 'the_12th_kit.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

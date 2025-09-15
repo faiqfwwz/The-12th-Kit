@@ -9,7 +9,9 @@ The 12th player's kit.
 ### Deployment
 You can access the web here: [The 12th Kit Web](https://ahmad-faiq41-the12thkit.pbp.cs.ui.ac.id/)
 
----
+### Archive
+<details>
+<summary>Tugas Individu 2</summary>
 
 ## Tugas Individu 2 - PBP Ganjil 2025/2026
 
@@ -57,3 +59,143 @@ Django sering dipakai sebagai permulaan pembelajaran karena mudah, lengkap, dan 
 ### Apakah ada feedback untuk asisten dosen tutorial 1 yang telah kamu kerjakan sebelumnya?
 
 Tidak ada.
+</details>
+
+---
+
+## Tugas Individu 3 - PBP Ganjil 2025/2026
+
+### Jelaskan mengapa kita memerlukan *data delivery* dalam pengimplementasian sebuah platform?
+
+*Data delivery* sangat penting dalam pengimplementasian sebuah platform karena memastikan data mengalir tepat waktu, efisien, dan aman antar komponen platform. Tanpa *data delivery* platform tidak dapat berfungsi secara maksimal, karena data yang dibutuhkan tidak dapat dialirkan/dikirimkan dengan benar.
+
+### Menurutmu, mana yang lebih baik antara XML dan JSON? Mengapa JSON lebih populer dibandingkan XML?
+
+Keduanya digunakan untuk pertukaran data dan pada dasarnya tidak ada yang absolut lebih baik. Namun, JSON kerap dipandang lebih unggul daripada XML sehingga lebih populer karena alasan berikut:
+
+   - **Keringkasan**: Struktur JSON umumnya lebih padat dibanding XML (tanpa tag pembuka/penutup), sehingga lebih mudah dibaca dan ditulis.
+   - **Integrasi dengan JavaScript**: Representasi JSON cocok dengan objek dan *array* di JavaScript, sehingga implementasinya dalam pengembangan *web* menjadi lebih sederhana.
+   - ***Parsing* lebih cepat**: Proses baca JSON umumnya lebih singkat, cocok untuk kebutuhan *real-time*.
+
+### Jelaskan fungsi dari method `is_valid()` pada form Django dan mengapa kita membutuhkan method tersebut?
+
+Fungsi *method* `is_valid()` adalah memastikan data yang di-*input* pengguna melalui *form* sudah valid. *Method* ini akan mengecek data yang di-*input* sudah sesuai ketentuan yang telah ditentukan (misalnya nama tidak boleh melebihi panjang maksimal). Tanpa `is_valid()` kita tidak bisa memastikan data yang masuk ke *database* itu aman dan valid. Oleh karena itu, *method* ini penting untuk menjaga keamanan aplikasi dan integritas data.
+
+### Mengapa kita membutuhkan `csrf_token` saat membuat form di Django? Apa yang dapat terjadi jika kita tidak menambahkan `csrf_token` pada form Django? Bagaimana hal tersebut dapat dimanfaatkan oleh penyerang?
+
+`csrf_token` bertujuan untuk mencegah serangan CSRF (Cross-Site Request Forgery), yaitu serangan siber di mana penyerang membuat pengguna yang terautentikasi untuk mengirimnkan *request* yang berbahaya. Tanpa `csrf_token`, penyerang bisa manipulasi *form* untuk melakukan aksi yang berbahaya seperti mengubah data. Oleh karena itu, `csrf_token` penting untuk mendeteksi *request* yang diterima benar-benar berasal dari pengguna yang sah.
+
+### Jelaskan bagaimana cara kamu mengimplementasikan *checklist* di atas secara *step-by-step* (bukan hanya sekadar mengikuti tutorial).
+
+1. **Membuat *form* untuk menambahkan produk baru**
+   - Buat berkas `forms.py` pada direktori `main` 
+      ```python
+      from django.forms import ModelForm
+      from main.models import Product
+
+      class ProductForm(ModelForm):
+         class Meta:
+            model = Product
+            fields = ["name", "price", "description", "thumbnail", "category", "is_featured", "stock", "brand", "league", "team", "season"]
+      ```
+   - Buat fungsi baru di `views.py` untuk input *form*
+      ```python
+      def create_product(request):
+         form = ProductForm(request.POST or None)
+
+         if form.is_valid() and request.method == "POST":
+            form.save()
+            return redirect('main:show_main')
+
+         context = {'form': form}
+         return render(request, "create_product.html", context)
+
+      def show_product(request, id):
+         product = get_object_or_404(Product, id=id)
+
+         context = {
+            'product' : product
+         }
+
+      return render(request, "product_detail.html", context)
+      ```
+   - Tambahkan path URL di `urls.py`
+      ```python
+      from django.urls import path
+      from main.views import show_main, create_product, show_product, show_xml, show_json, show_xml_by_id, show_json_by_id
+
+      app_name = 'main'
+
+      urlpatterns = [
+         path('', show_main, name='show_main'),
+         path('create-product/', create_product, name='create_product'),
+         path('product/<str:id>/', show_product, name='show_product'),
+      ]
+      ```
+   - Modifikasi template `main.html`, kemudian buat `create_product.html` dan `product_detail.html`
+
+2. **Buat 4 fungsi untuk melihat produk yang sudah ditambahkan dalam format XML, JSON, XML by *ID*, dan JSON by *ID***
+
+   - Buat 4 fungsi baru di `views.py`
+      ```python
+      def show_xml(request):
+         product_list = Product.objects.all()
+         xml_data = serializers.serialize("xml", product_list)
+         return HttpResponse(xml_data, content_type="application/xml")
+
+      def show_json(request):
+         product_list = Product.objects.all()
+         json_data = serializers.serialize("json", product_list)
+         return HttpResponse(json_data, content_type="application/json")
+
+      def show_xml_by_id(request, product_id):
+         try:
+            product_item = Product.objects.filter(pk=product_id)
+            xml_data = serializers.serialize("xml", product_item)
+            return HttpResponse(xml_data, content_type="application/xml")
+         except Product.DoesNotExist:
+            return HttpResponse(status=404)
+
+      def show_json_by_id(request, product_id):
+         try:   
+            product_item = Product.objects.filter(pk=product_id)
+            json_data = serializers.serialize("json", [product_item])
+            return HttpResponse(json_data, content_type="application/json")
+         except Product.DoesNotExist:
+            return HttpResponse(status=404)      
+      ```
+   - Tambahkan routing URL di `urls.py`
+      ```python
+      from django.urls import path
+      from main.views import show_main, create_product, show_product, show_xml, show_json, show_xml_by_id, show_json_by_id
+
+      app_name = 'main'
+
+      urlpatterns = [
+         path('', show_main, name='show_main'),
+         path('create-product/', create_product, name='create_product'),
+         path('product/<str:id>/', show_product, name='show_product'),
+         path('xml/', show_xml, name='show_xml'),
+         path('json/', show_json, name='show_json'),
+         path('xml/<str:news_id>/', show_xml_by_id, name='show_xml_by_id'),
+         path('json/<str:news_id>/', show_json_by_id, name='show_json_by_id'),
+      ]
+      ```
+
+### Apakah ada feedback untuk asdos di tutorial 2 yang sudah kalian kerjakan?
+
+Tidak ada.
+
+### Hasil akses URL pada Postman
+
+**XML**
+![XML](https://github.com/user-attachments/assets/4b484b6e-85d3-4d39-bc44-e636e6188746)
+
+**JSON**
+![JSON](https://github.com/user-attachments/assets/59568a98-29bb-4ba8-8cc3-5dac57ddd87f)
+
+**XML by *ID***
+![XMLbyID](https://github.com/user-attachments/assets/28a8b1ce-a28b-4a9d-827c-24fb062a0e14)
+
+**JSON by *ID***
+![JSONbyID](https://github.com/user-attachments/assets/ac1e95d5-0ae3-4209-830f-fd72cc69ec9b)
