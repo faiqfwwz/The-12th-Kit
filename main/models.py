@@ -2,9 +2,12 @@ from django.db import models
 from django.utils.text import slugify
 import re
 import uuid
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Product(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
     CATEGORY_CHOICES = [
     ('club_home', 'Club • Home'),

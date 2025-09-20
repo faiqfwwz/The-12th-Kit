@@ -61,7 +61,8 @@ Django sering dipakai sebagai permulaan pembelajaran karena mudah, lengkap, dan 
 Tidak ada.
 </details>
 
----
+<details>
+<summary>Tugas Individu 3</summary>
 
 ## Tugas Individu 3 - PBP Ganjil 2025/2026
 
@@ -199,3 +200,271 @@ Tidak ada.
 
 **JSON by *ID***
 ![JSONbyID](https://github.com/user-attachments/assets/ac1e95d5-0ae3-4209-830f-fd72cc69ec9b)
+</details>
+
+---
+
+## Tugas Individu 4 - PBP Ganjil 2025/2026
+
+### Apa itu Django `AuthenticationForm`? Jelaskan juga kelebihan dan kekurangannya.
+
+`AuthenticationForm` adalah form bawaan Django untuk login user. Form ini merupakan bagian dari Django's authentication system dan terletak di `django.contrib.auth.forms`. Form ini menyediakan field username dan password, melakukan validasi kredensial lewat authentication backends, serta mengembalikan user yang lolos autentikasi. Kelebihannya itu siap pakai dan terintegrasi, serta aman secara default. Kekurangannya hanya terbatas pada username dan password dan tidak mendukung 2FA. Namun, form ini dapat mudah dikostumisasi sesuai dengan kebutuhan.
+
+### Apa perbedaan antara autentikasi dan otorisasi? Bagaiamana Django mengimplementasikan kedua konsep tersebut?
+
+- Autentikasi: Proses verifikasi identitas User biasanya melalui kombinasi username dan password. Django menyediakan sistem autentikasi bawaan di `django.contrib.auth`, contoh mekanismenya yaitu `login()` untuk membuat sesi dan menempelkan user ke `request.user`.
+- Otorisasi: Proses menentukan hak akses setelah user berhasil diautentikasi. Misalnya, user biasa boleh membaca produk, tetapi hanya admin yang bisa menambah atau menghapus. Django mengatur otorisasi berbasis permissions dan groups. Kemudian, ada juga decorators untuk function-based views, contohnya `@login_required` yang membatasi akses view hanya untuk pengguna yang sudah login. Jika belum, redirect ke halaman login.
+
+### Apa saja kelebihan dan kekurangan *session* dan *cookies* dalam konteks menyimpan state di aplikasi web?
+
+- Session: Kelebihannya yaitu lebih aman karena data sensitif tidak disimpan di client (client hanya menerima session ID), server juga dapat menyimpan data dengan jumlah besar dan mengubah atau menghapus session kapan pun. Untuk kekurangannya yaitu bisa membuat beban storage semakin banyak dan bergantung pada cookie.
+- Cookie: Kelebihannya yaitu disimpan di client jadi tidak perlu storage di server. Cookies juga merupakan stateless server sehingga cocok untuk arsitektur skala besar. Kekurangannya yaitu ukurannya terbatas dan rentan dilihat dan dimanipulasi.
+
+###  Apakah penggunaan *cookies* aman secara *default* dalam pengembangan web, atau apakah ada risiko potensial yang harus diwaspadai? Bagaimana Django menangani hal tersebut?
+
+Cookies tidak sepenuhnya aman secara default karena berpotensi mengalami pencurian, manipulasi, penyadapan jika tidak menggunakan HTTPS, serta rawan disalahgunakan untuk serangan CSRF, sebab cookies selalu ikut terkirim di setiap request. Untuk mengatasi hal ini, Django menyediakan mekanisme keamanan bawaan seperti menyimpan session data di server, hanya `sessionid` yang dikirim sebagai cookie. Kemudian, ada juga CSRF token `{% csrf_token %}` yang dapat mencegah serangan CSRF meski cookie `sessionid` otomatis terkirim.
+
+### Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).
+
+1. Implementasi registrasi, login, dan logout.
+
+   - Menambahkan fungsi registrasi, login, dan logout di `views.py`.
+      ```python
+      from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+      from django.contrib.auth import authenticate, login
+      from django.contrib import messages
+
+      def register(request):
+         form = UserCreationForm()
+
+         if request.method == "POST":
+            form = UserCreationForm(request.POST)
+            if form.is_valid():
+                  form.save()
+                  messages.success(request, 'Your account has been successfully created!')
+                  return redirect('main:login')
+         context = {'form':form}
+         return render(request, 'register.html', context)
+
+      def login_user(request):
+         if request.method == 'POST':
+            form = AuthenticationForm(data=request.POST)
+
+            if form.is_valid():
+                  user = form.get_user()
+                  login(request, user)
+                  return redirect('main:show_main')
+
+         else:
+            form = AuthenticationForm(request)
+         context = {'form': form}
+         return render(request, 'login.html', context)
+
+      def logout_user(request):
+         logout(request)
+         return redirect('main:login')
+      ```
+
+   - Modifikasi template html.
+      - `register.html`
+         ```html
+         {% extends 'base.html' %}
+
+         {% block meta %}
+         <title>Register</title>
+         {% endblock meta %}
+
+         {% block content %}
+
+         <div>
+         <h1>Register</h1>
+
+         <form method="POST">
+            {% csrf_token %}
+            <table>
+               {{ form.as_table }}
+               <tr>
+               <td></td>
+               <td><input type="submit" name="submit" value="Daftar" /></td>
+               </tr>
+            </table>
+         </form>
+
+         {% if messages %}
+         <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+         </ul>
+         {% endif %}
+         </div>
+
+         {% endblock content %}
+         ```
+      - `login.html`
+         ```html
+         {% extends 'base.html' %}
+
+         {% block meta %}
+         <title>Login</title>
+         {% endblock meta %}
+
+         {% block content %}
+         <div class="login">
+         <h1>Login</h1>
+
+         <form method="POST" action="">
+            {% csrf_token %}
+            <table>
+               {{ form.as_table }}
+               <tr>
+               <td></td>
+               <td><input class="btn login_btn" type="submit" value="Login" /></td>
+               </tr>
+            </table>
+         </form>
+
+         {% if messages %}
+         <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+         </ul>
+         {% endif %} Don't have an account yet?
+         <a href="{% url 'main:register' %}">Register Now</a>
+         </div>
+
+         {% endblock content %}
+         ```
+      - `main.html`
+         ```html
+         <a href="{% url 'main:logout' %}">
+         <button>Logout</button>
+         </a>
+         ```
+   - Tambahkan path URL ke dalam `urlpatterns`.
+      ```python
+      urlpatterns = [
+         path('', show_main, name='show_main'),
+         path('create-product/', create_product, name='create_product'),
+         path('product/<str:id>/', show_product, name='show_product'),
+         path('xml/', show_xml, name='show_xml'),
+         path('json/', show_json, name='show_json'),
+         path('xml/<str:product_id>/', show_xml_by_id, name='show_xml_by_id'),
+         path('json/<str:product_id>/', show_json_by_id, name='show_json_by_id'),
+         path('register/', register, name='register'),
+         path('login/', login_user, name='login'),
+         path('logout/', logout_user, name='logout'),
+      ]  
+      ```
+
+2. Implementasi data dari cookies.
+
+   - Modifikasi `views.py`
+      ```python
+      import datetime
+      from django.http import HttpResponseRedirect
+      from django.urls import reverse
+
+      # Ubah blok kode if form.is_valid() di login_user
+      if form.is_valid():
+         user = form.get_user()
+         login(request, user)
+         response = HttpResponseRedirect(reverse("main:show_main"))
+         response.set_cookie('last_login', str(datetime.datetime.now()))
+         return response
+
+      # Tambahkan 'last_login': request.COOKIES.get('last_login', 'Never') pada context show_main
+      context = {
+            'npm' : '2406397706',
+            'name': 'Ahmad Faiq Fawwaz Abdussalam',
+            'class': 'PBP C',
+            'product_list': product_list,
+            'last_login': request.COOKIES.get('last_login', 'Never')
+         }
+      
+      # Ubah fungsi logout_user untuk menghapus cookie last_login setelah melakukan logout
+      def logout_user(request):
+         logout(request)
+         response = HttpResponseRedirect(reverse('main:login'))
+         response.delete_cookie('last_login')
+         return response
+      ```
+   
+   - Modifikasi `main.html` untuk menampilkan data waktu terakhir pengguna login.
+      ```html
+      <h5>Sesi terakhir login: {{ last_login }}</h5>
+      ```
+
+3. Menghubungkan model `Product` dengan `User`.
+
+   - Modifikasi `models.py` kemudian makemigrations dan migrate.
+      ```python
+      from django.contrib.auth.models import User
+
+      class Product(models.Model):
+         user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+      ```
+   
+   - Modifikasi `views.py`.
+      ```python
+      def create_product(request):
+         form = ProductForm(request.POST or None)
+
+         if form.is_valid() and request.method == "POST":
+            product_entry = form.save(commit=False)
+            product_entry.user = request.user
+            product_entry.save()
+            return redirect('main:show_main')
+
+         context = {'form': form}
+         return render(request, "create_product.html", context)
+
+      @login_required(login_url='/login')
+      def show_main(request):
+         filter_type = request.GET.get("filter", "all")
+
+         if filter_type == "all":
+            product_list = Product.objects.all()
+         else:
+            product_list = Product.objects.filter(user=request.user)
+
+         context = {
+            'npm' : '2406397706',
+            'name': request.user.username,
+            'class': 'PBP C',
+            'product_list': product_list,
+            'last_login': request.COOKIES.get('last_login', 'Never')
+         }
+
+         return render(request, "main.html", context)
+      ```
+   
+   - Modifikasi templates yang sesuai.
+      - `main.html`
+         ```html
+         <a href="?filter=all">
+            <button type="button">All Products</button>
+         </a>
+         <a href="?filter=my">
+            <button type="button">My Products</button>
+         </a>
+         ```
+      - `product_detail.html`
+         ```html
+         {% if product.user %}
+         <p>Added by: {{ product.user.username }}</p>
+         {% else %}
+         <p>Added by: Anonymous</p>
+         {% endif %}
+         ```
+
+4. Membuat dua (2) akun pengguna dengan masing-masing tiga (3) dummy data menggunakan model yang telah dibuat sebelumnya untuk setiap akun di lokal.
+
+   - faiqfwwz
+   ![faiqfwwz](https://github.com/user-attachments/assets/9c208af5-847c-40c1-99ac-69cd6989b619)
+
+   - ahmfaiq
+   ![ahmfaiq](https://github.com/user-attachments/assets/a7453fb6-2e63-460b-880a-436e7f377c67)
+
+5. Commit dan push ke github dan pws.
