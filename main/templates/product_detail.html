@@ -1,31 +1,100 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block meta %}
+<title>{{ product.name }} - The 12th Kit</title>
+{% endblock meta %}
+
 {% block content %}
-<p><a href="{% url 'main:show_main' %}"><button>← Back to Product List</button></a></p>
+<div class="bg-[#0A192F] w-full min-h-screen">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-<h1>{{ product.name }}</h1>
+    <!-- Back Navigation -->
+    <div class="mb-6">
+      <a href="{% url 'main:show_main' %}" class="text-white/80 hover:text-white font-medium transition-colors">
+        ← Back to product
+      </a>
+    </div>
 
-<p>
-  <b>{{ product.get_category_display }}</b>
-  {% if product.is_featured %} | <b>Featured</b>{% endif %}
-  | <i>Season: {{ product.season }}</i>
-  {% if product.brand %} | Brand: {{ product.brand }}{% endif %}
-  {% if product.team %} | Team: {{ product.team }}{% endif %}
-  {% if product.league %} ({{ product.league }}){% endif %}
-</p>
+    <!-- Product -->
+    <article class="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden">
 
-{% if product.thumbnail %}
-  <img src="{{ product.thumbnail }}" alt="Product thumbnail" width="300">
-  <br /><br />
-{% endif %}
+      <!-- Header -->
+      <div class="p-6 sm:p-8">
+        <div class="flex flex-wrap items-center gap-2 mb-4">
+          <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-[#00FF88] text-[#0A192F]">
+            {{ product.get_category_display }}
+          </span>
 
-<p>Harga: Rp {{ product.price }} | Stok: {{ product.stock }}</p>
+          {% if product.is_featured %}
+          <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-yellow-100 text-yellow-800">
+            Featured
+          </span>
+          {% endif %}
 
-<p>{{ product.description }}</p>
+          {% if product.season %}
+          <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700">
+            Season: {{ product.season }}
+          </span>
+          {% endif %}
+          {% if product.brand %}
+          <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700">
+            Brand: {{ product.brand }}
+          </span>
+          {% endif %}
+          {% if product.team %}
+          <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700">
+            Team: {{ product.team }}
+          </span>
+          {% endif %}
+          {% if product.league %}
+          <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700">
+            {{ product.league }}
+          </span>
+          {% endif %}
+        </div>
 
-{% if product.user %}
-  <p>Added by: {{ product.user.username }}</p>
-{% else %}
-  <p>Added by: Anonymous</p>
-{% endif %}
+        <h1 class="text-3xl sm:text-4xl font-bold text-[#0A192F] leading-tight mb-4">
+          {{ product.name|default:"Unnamed Product" }}
+        </h1>
 
+        <div class="flex flex-wrap items-center text-sm text-gray-600 gap-4">
+          <span>Price: <span class="font-semibold">Rp {{ product.price }}</span></span>
+          <span>Stock: <span class="font-semibold">{{ product.stock }}</span></span>
+        </div>
+      </div>
+
+      {% if product.thumbnail %}
+      <div class="px-6 sm:px-8">
+        <img src="{{ product.thumbnail }}" alt="{{ product.name|default:'Product image' }}"
+             class="w-full h-64 sm:h-80 lg:h-96 object-cover rounded-lg">
+      </div>
+      {% endif %}
+
+      <div class="p-6 sm:p-8">
+        <div class="prose prose-lg max-w-none">
+          <div class="text-gray-700 leading-relaxed whitespace-pre-line text-base sm:text-lg">
+            {{ product.description|default:"No description yet." }}
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-[#E5E7EB] p-6 sm:p-8 bg-[#F9FAFB]">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="font-medium text-[#0A192F]">
+              {% if product.user %}
+                <p>Author: {{ product.user.username }}</p>
+              {% else %}
+                <p>Author: Anonymous</p>
+              {% endif %}
+            </div>
+            <p class="text-sm text-gray-500">Author</p>
+          </div>
+        </div>
+      </div>
+
+    </article>
+  </div>
+</div>
 {% endblock content %}

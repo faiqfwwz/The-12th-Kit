@@ -202,7 +202,8 @@ Tidak ada.
 ![JSONbyID](https://github.com/user-attachments/assets/ac1e95d5-0ae3-4209-830f-fd72cc69ec9b)
 </details>
 
----
+<details>
+<summary>Tugas Individu 4</summary>
 
 ## Tugas Individu 4 - PBP Ganjil 2025/2026
 
@@ -468,3 +469,197 @@ Cookies tidak sepenuhnya aman secara default karena berpotensi mengalami pencuri
    ![ahmfaiq](https://github.com/user-attachments/assets/a7453fb6-2e63-460b-880a-436e7f377c67)
 
 5. Commit dan push ke github dan pws.
+</details>
+
+---
+
+## Tugas Individu 5 - PBP Ganjil 2025/2026
+
+### Jika terdapat beberapa CSS selector untuk suatu elemen HTML, jelaskan urutan prioritas pengambilan CSS selector tersebut!
+
+Agar tidak bingung ketika banyak aturan CSS yang menimpa satu sama lain pada sebuah elemen, CSS punya sistem prioritas yang disebut specificity. Urutan prioritasnya adalah seperti ini:
+
+1. Inline styles (misalnya `<p id="intro" class="text" style="color: orange">...</p>`)
+2. ID selectors (misalnya `#intro { color: green; }`)
+3. Classes selector (misalnya `.text { color: blue; }`)
+4. Element selector (misalnya `p { color: black; }`)
+5. Dengan menggunakan `!important`, sebuah properti dapat mengesampingkan seluruh aturan prioritas yang telah ditetapkan, karena ia langsung diberikan prioritas tertinggi.
+
+### Mengapa *responsive design* menjadi konsep yang penting dalam pengembangan aplikasi *web*? Berikan contoh aplikasi yang sudah dan belum menerapkan *responsive design*, serta jelaskan mengapa!
+
+Responsive design memungkinkan web dapat menyesuaikan diri dengan berbagai ukuran dan orientasi layar perangkat pengguna. Oleh karena itu, responsive design penting karena pengguna mengakses web dari berbagai perangkat seperti dekstop, tablet, dan smartphone. Jika desainnya tidak responsif, maka pengguna bisa saja mengalami kesulitan seperti teks tidak terbaca di layar yang lebih kecil.
+
+Contoh aplikasi yang sudah menerapkan responsive design adalah X (Twitter) Web yang sudah menyesuaikan tampilan berdasarkan ukuran layar pengguna. Contoh aplikasi yang belum menerapkan responsive design adalah SIAK-NG yang jika diakses melalui smartphone, maka pengguna akan kesulitan membaca teks dan mengakses tombol yang ada.
+
+### Jelaskan perbedaan antara *margin*, *border*, dan *padding*, serta cara untuk mengimplementasikan ketiga hal tersebut!
+
+![Box Model CSS](https://pbp-fasilkom-ui.github.io/ganjil-2026/assets/images/t4-1-833b8ee0d0dd53959be9b66d452cd1d6.png)
+
+1. Margin: ruang di luar kotak (memisahkan elemen dari elemen lain, tidak punya warna/latarnya)
+2. Border: garis/bingkai yang mengelilingi kotak (punya ketebalan, jenis garis, dan warna)
+3. Padding: ruang di dalam border yang mendorong isi (teks/gambar) menjauh dari tepi kotak
+
+#### Contoh implementasi
+```css
+div {
+    margin: 20px;
+    border: 2px solid;    
+    padding: 10px;
+}
+```
+
+### Jelaskan konsep *flex box* dan *grid layout* beserta kegunaannya!
+
+#### Flex box
+Sistem layout satu dimensi yang mengatur elemen sepanjang satu sumbu (baris atau kolom) dengan mudah. Flex box cocok untuk meratakan, mendistribusikan ruang, dan membuat komponen adaptif seperti navbar, deret tombol, atau kartu yang tingginya seragam.
+
+#### Grid layout
+Sistem dua dimensi yang memungkinkan kita mendefinisikan kolom dan baris sekaligus, menempatkan elemen secara presisi (termasuk area grid), sehingga ideal untuk kerangka halaman kompleks seperti galeri atau dashboard.
+
+###  Jelaskan bagaimana cara kamu mengimplementasikan *checklist* di atas secara *step-by-step* (bukan hanya sekadar mengikuti tutorial)!
+
+1. Implementasi fungsi menghapus dan mengedit product
+
+   - Tambah fungsi di `views.py`
+      ```python
+      def edit_product(request, id):
+         product = get_object_or_404(Product, pk=id)
+         form = ProductForm(request.POST or None, instance=product)
+         if form.is_valid() and request.method == 'POST':
+            form.save()
+            return redirect('main:show_main')
+
+         context = {
+            'form': form
+         }
+
+         return render(request, "edit_product.html", context)
+
+      def delete_product(request, id):
+         product = get_object_or_404(Product, pk=id)
+         product.delete()
+         return HttpResponseRedirect(reverse('main:show_main'))
+      ```
+   
+   - Tambahkan routing URL di `urls.py`
+      ```python
+      path('product/<uuid:id>/edit', edit_product, name='edit_product'),
+      path('product/<uuid:id>/delete', delete_product, name='delete_product'),
+      ```
+   
+2. Kustomisasi desain template yang sudah dibuat sebelumnya menggunakan Tailwind
+
+   - Inisiasi tailwind
+      - `base.html`
+      ```html
+      {% load static %}
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+         <meta charset="UTF-8" />
+         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+         {% block meta %} {% endblock meta %}
+         <script src="https://cdn.tailwindcss.com"></script>
+         <link rel="stylesheet" href="{% static 'css/global.css' %}"/>
+      </head>
+      <body>
+         {% block content %} {% endblock content %}
+      </body>
+      </html>
+      ```
+
+      - Konfigurasi static files
+      ```python
+      MIDDLEWARE = [
+         'django.middleware.security.SecurityMiddleware',
+         'whitenoise.middleware.WhiteNoiseMiddleware', 
+         ...
+      ]
+      STATIC_URL = '/static/'
+      if DEBUG:
+         STATICFILES_DIRS = [
+            BASE_DIR / 'static' # merujuk ke /static root project pada mode development
+         ]
+      else:
+         STATIC_ROOT = BASE_DIR / 'static' # merujuk ke /static root project pada mode production
+      ```
+
+      - Menambahkan `global.css`
+      ```css
+      /* Palette B variables */
+      :root{
+      --brand-navy:   #0A192F;
+      --brand-surface:#FFFFFF;
+      --brand-accent: #00FF88; /* neon green */
+      --brand-muted:  #F3F4F6;
+      --brand-border: #E5E7EB;
+      }
+
+      /* Inputs */
+      .form-style form input,
+      .form-style form textarea,
+      .form-style form select {
+      width: 100%;
+      padding: 0.5rem;
+      border: 2px solid var(--brand-border);
+      border-radius: 0.375rem;
+      background: var(--brand-surface);
+      }
+
+      /* Focus state (neon ring) */
+      .form-style form input:focus,
+      .form-style form textarea:focus,
+      .form-style form select:focus {
+      outline: none;
+      border-color: var(--brand-accent);
+      /* sedikit transparan agar lembut */
+      box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.35);
+      }
+
+      /* Checkbox base */
+      .form-style input[type="checkbox"] {
+      width: 1.25rem;
+      height: 1.25rem;
+      padding: 0;
+      border: 2px solid var(--brand-border);
+      border-radius: 0.375rem;
+      background-color: var(--brand-surface);
+      cursor: pointer;
+      position: relative;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      }
+
+      /* Checkbox checked */
+      .form-style input[type="checkbox"]:checked {
+      background-color: var(--brand-accent);
+      border-color: var(--brand-accent);
+      }
+
+      /* Gunakan navy untuk centang agar kontras dgn neon */
+      .form-style input[type="checkbox"]:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--brand-navy);
+      font-weight: bold;
+      font-size: 0.875rem;
+      }
+
+      /* Checkbox focus */
+      .form-style input[type="checkbox"]:focus {
+      outline: none;
+      border-color: var(--brand-accent);
+      box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.25);
+      }
+
+      /* (Opsional) Placeholder & label tones agar nyatu dengan palette */
+      .form-style ::placeholder { color: #6B7280; }
+      .form-style label { color: var(--brand-navy); }
+      ```
+   
+   - Styling pada tiap template
+   

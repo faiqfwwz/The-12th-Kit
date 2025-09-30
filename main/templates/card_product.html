@@ -1,0 +1,59 @@
+{# card_product_simple.html #}
+{% load static %}
+{% load humanize %}
+
+<article class="group relative h-full flex flex-col bg-white rounded-lg border border-[#E5E7EB] overflow-hidden hover:shadow-md transition">
+
+  <!-- Gambar -->
+  <a href="{% url 'main:show_product' product.id %}" class="relative block bg-[#F3F4F6]">
+    <div class="aspect-[3/4] w-full overflow-hidden">
+      {% if product.thumbnail %}
+        <img src="{{ product.thumbnail }}" alt="{{ product.name|default:'Product image' }}"
+             class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]">
+      {% else %}
+        <div class="w-full h-full bg-[#F3F4F6]"></div>
+      {% endif %}
+    </div>
+  </a>
+
+  <!-- Info (flex-1 agar mengisi sisa tinggi) -->
+  <div class="p-4 flex-1 flex flex-col">
+    <div class="text-xs text-gray-500 mb-1">
+      {{ product.get_category_display }}
+      {% if product.team %} · {{ product.team }}{% endif %}
+    </div>
+
+    <!-- Judul dibatasi 2 baris -->
+    <h3 class="text-[15px] font-semibold text-[#0A192F] leading-snug mb-2 line-clamp-2">
+      <a href="{% url 'main:show_product' product.id %}" class="hover:underline">
+        {{ product.name }}
+      </a>
+    </h3>
+
+    <!-- Spacer otomatis -> Harga selalu di bawah -->
+    <div class="mt-auto flex items-baseline gap-2">
+      {% if product.original_price and product.price < product.original_price %}
+        <span class="text-[15px] font-semibold text-[#EF4444]">
+          Rp. {{ product.price|intcomma }}
+        </span>
+        <span class="text-sm text-gray-400 line-through">
+          Rp. {{ product.original_price|intcomma }}
+        </span>
+      {% else %}
+        <span class="text-[15px] font-semibold text-[#0A192F]">
+          Rp. {{ product.price|intcomma }}
+        </span>
+      {% endif %}
+    </div>
+  </div>
+
+  {# (Opsional) Action bar owner – ini juga tidak akan bikin tinggi random #}
+  {% if user.is_authenticated and product.user_id and product.user_id == user.id %}
+    <div class="px-4 pb-4">
+      <div class="flex items-center justify-end gap-3 pt-3 border-t border-[#E5E7EB]">
+        <a href="{% url 'main:edit_product' product.id %}" class="text-sm font-medium text-[#0A192F] hover:text-[#0A192F]/70">Edit</a>
+        <a href="{% url 'main:delete_product' product.id %}" class="text-sm font-medium text-red-600 hover:text-red-700">Delete</a>
+      </div>
+    </div>
+  {% endif %}
+</article>

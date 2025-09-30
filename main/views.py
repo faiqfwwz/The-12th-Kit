@@ -125,7 +125,7 @@ def edit_product(request, id):
         'form': form
     }
 
-    return render(request, "edit_news.html", context)
+    return render(request, "edit_product.html", context)
 
 def delete_product(request, id):
     product = get_object_or_404(Product, pk=id)

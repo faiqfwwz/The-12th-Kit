@@ -1,55 +1,74 @@
-<h1>The 12th Kit</h1>
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
 
-<h5>NPM: </h5>
-<p>{{ npm }}</p>
-<h5>Name: </h5>
-<p>{{ name }}<p>
-<h5>Class: </h5>
-<p>{{ class }}</p>
+{% block meta %}
+<title>Football product</title>
+{% endblock meta %}
 
-<a href="{% url 'main:create_product' %}">
-  <button>+ Add Product</button>
-</a>
-<a href="{% url 'main:logout' %}">
-  <button>Logout</button>
-</a>
-<h5>Sesi terakhir login: {{ last_login }}</h5>
-<hr>
-<a href="?filter=all">
-    <button type="button">All Products</button>
-</a>
-<a href="?filter=my">
-    <button type="button">My Products</button>
-</a> 
+{% block content %}
+{% include 'navbar.html' %}
 
-{% if not product_list %}
-<p>Belum ada produk yang dibuat.</p>
-{% else %}
+<!-- MAIN: gelap -->
+<div class="bg-[#0A192F] w-full pt-16 min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-{% for product in product_list %}
-<div>
-  <h2><a href="{% url 'main:show_product' product.id %}">{{ product.name }}</a></h2>
+    <!-- Header Section -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-white mb-2">Fresh Off the Pitch</h1>
+      <p class="text-white/70">Never miss your club’s latest jersey.</p>
+    </div>
 
-  <p>
-    <b>{{ product.get_category_display }}</b>
-    {% if product.is_featured %} | <b>Featured</b>{% endif %}
-    | <i>Season: {{ product.season }}</i>
-    | Brand: {{ product.brand }}
-    | Team: {{ product.team }}{% if product.league %} ({{ product.league }}){% endif %}
-  </p>
+    <!-- Filter Section: dark card biar nyatu -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 bg-[#10243F] rounded-lg border border-white/10 p-4">
+      <div class="flex space-x-3 mb-4 sm:mb-0">
+        <a href="?"
+           class="px-4 py-2 rounded-md font-medium transition-colors
+           {% if request.GET.filter == 'all' or not request.GET.filter %}
+             bg-[#00FF88] text-[#0A192F]
+           {% else %}
+             bg-white/5 text-white/80 border border-white/10 hover:bg-white/10
+           {% endif %}">
+          All product
+        </a>
 
-  {% if product.thumbnail %}
-    <img src="{{ product.thumbnail }}" alt="thumbnail" width="150" height="100"><br />
-  {% endif %}
+        <a href="?filter=my"
+           class="px-4 py-2 rounded-md font-medium transition-colors
+           {% if request.GET.filter == 'my' %}
+             bg-[#00FF88] text-[#0A192F]
+           {% else %}
+             bg-white/5 text-white/80 border border-white/10 hover:bg-white/10
+           {% endif %}">
+          My product
+        </a>
+      </div>
 
-  <p>Harga: Rp {{ product.price }} | Stok: {{ product.stock }}</p>
+      {% if user.is_authenticated %}
+        <div class="text-sm text-white/60">
+          Last login: {{ last_login }}
+        </div>
+      {% endif %}
+    </div>
 
-  <p>{{ product.description|truncatewords:25 }}...</p>
-
-  <p><a href="{% url 'main:show_product' product.id %}"><button>Detail</button></a></p>
+    <!-- Product Grid: 2 per baris -->
+    {% if not product_list %}
+      <div class="bg-[#10243F] rounded-lg border border-white/10 p-12 text-center text-white">
+        <div class="w-32 h-32 mx-auto mb-4 opacity-90">
+          <img src="{% static 'image/no-product.png' %}" alt="No product available" class="w-full h-full object-contain brightness-90">
+        </div>
+        <h3 class="text-lg font-medium mb-2">No product found</h3>
+        <p class="text-white/70 mb-6">Be the first to share football product with the community.</p>
+        <a href="{% url 'main:create_product' %}" class="inline-flex items-center px-4 py-2 bg-[#00FF88] text-[#0A192F] rounded-md hover:bg-[#00e67b] transition-colors">
+          Create product
+        </a>
+      </div>
+    {% else %}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 auto-rows-[1fr] items-stretch">
+        {% for product in product_list %}
+            {% include 'card_product.html' with product=product %}
+        {% endfor %}
+    </div>
+    {% endif %}
+  </div>
 </div>
-
-<hr>
-{% endfor %}
-
-{% endif %}
+{% endblock content %}

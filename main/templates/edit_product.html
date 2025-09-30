@@ -1,30 +1,33 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block meta %}
-<title>Create Product - The 12th Kit</title>
+<title>Edit Product - The 12th Kit</title>
 {% endblock meta %}
 
 {% block content %}
 <div class="w-full min-h-screen bg-[#0A192F]">
   <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
+    
     <!-- Back Navigation -->
     <div class="mb-6">
       <a href="{% url 'main:show_main' %}" class="text-white/80 hover:text-white font-medium transition-colors">
         ← Back to Products
       </a>
     </div>
-
+    
     <!-- Form Card -->
     <div class="bg-white rounded-lg border border-[#E5E7EB] p-6 sm:p-8 form-style">
       <div class="mb-8">
-        <h1 class="text-2xl font-bold text-[#0A192F] mb-2">Add Product</h1>
-        <p class="text-gray-600">Masukkan detail jersey/produk untuk ditampilkan di toko</p>
+        <h1 class="text-2xl font-bold text-[#0A192F] mb-2">Edit Product</h1>
+        <p class="text-gray-600">Perbarui detail jersey/produk kamu</p>
       </div>
-
+      
       <form method="POST" class="space-y-6">
         {% csrf_token %}
+
         {% if form.non_field_errors %}
-          <div class="text-red-600 text-sm">
+          <div class="text-sm text-red-600">
             {{ form.non_field_errors }}
           </div>
         {% endif %}
@@ -45,18 +48,17 @@
             {% endfor %}
           </div>
         {% endfor %}
-
+        
         <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-[#E5E7EB]">
           <a href="{% url 'main:show_main' %}" class="order-2 sm:order-1 px-6 py-3 border border-[#E5E7EB] text-[#0A192F] rounded-md font-medium hover:bg-[#F3F4F6] transition-colors text-center">
             Cancel
           </a>
           <button type="submit" class="order-1 sm:order-2 flex-1 bg-[#00FF88] text-[#0A192F] px-6 py-3 rounded-md font-medium hover:bg-[#00e67b] transition-colors focus:outline-none focus:ring-2 focus:ring-[#00FF88]/40 focus:ring-offset-2 focus:ring-offset-white">
-            Add Product
+            Update Product
           </button>
         </div>
       </form>
     </div>
-
   </div>
 </div>
 {% endblock %}
