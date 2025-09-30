@@ -662,4 +662,10 @@ Sistem dua dimensi yang memungkinkan kita mendefinisikan kolom dan baris sekalig
       ```
    
    - Styling pada tiap template
-   
+      - [Card Product](https://github.com/faiqfwwz/The-12th-Kit/blob/master/main/templates/card_product.html)
+      - [Create Product](https://github.com/faiqfwwz/The-12th-Kit/blob/master/main/templates/create_product.html)
+      - [Edit Product](https://github.com/faiqfwwz/The-12th-Kit/blob/master/main/templates/edit_product.html)
+      - [Login](https://github.com/faiqfwwz/The-12th-Kit/blob/master/main/templates/login.html)
+      - [Main](https://github.com/faiqfwwz/The-12th-Kit/blob/master/main/templates/main.html)
+      - [Product Detail](https://github.com/faiqfwwz/The-12th-Kit/blob/master/main/templates/product_detail.html)
+      - [Register](https://github.com/faiqfwwz/The-12th-Kit/blob/master/main/templates/register.html)
