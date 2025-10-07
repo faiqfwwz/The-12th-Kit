@@ -1,6 +1,4 @@
 from django.db import models
-from django.utils.text import slugify
-import re
 import uuid
 from django.contrib.auth.models import User
 

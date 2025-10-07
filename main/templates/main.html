@@ -41,7 +41,9 @@
         </button>
       </div>
       {% if user.is_authenticated %}
-        <div class="text-sm text-white/60">Last login: {{ last_login }}</div>
+        <div class="text-sm text-white/60">
+          Last login: {% firstof user.last_login|date:"d M Y, H:i" "Never" %}
+        </div>
       {% endif %}
     </div>
 
