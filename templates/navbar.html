@@ -11,7 +11,7 @@
       <!-- Desktop Nav -->
       <div class="hidden md:flex items-center space-x-8">
         <a href="{% url 'main:show_main' %}" class="text-white/80 hover:text-white font-medium transition-colors">Home</a>
-        <a href="#" id="nav-create-product" class="text-white/80 hover:text-white font-medium transition-colors">Add Product</a>
+        <a href="#" data-create-product class="text-white/80 hover:text-white font-medium">Add Product</a>
       </div>
 
       <!-- Desktop User -->
@@ -52,7 +52,7 @@
     <div class="px-6 py-4 space-y-4">
       <div class="space-y-1">
         <a href="{% url 'main:show_main' %}" class="block text-white/80 hover:text-white font-medium py-3 transition-colors">Home</a>
-        <a href="#" id="nav-create-product" class="block text-white/80 hover:text-white font-medium py-3 transition-colors">Add Product</a>
+        <a href="#" data-create-product class="block text-white/80 hover:text-white font-medium py-3">Add Product</a>
       </div>
       <div class="border-t border-white/10 pt-4">
         {% if user.is_authenticated %}
@@ -135,5 +135,8 @@
   document.querySelectorAll('.mobile-menu a, .mobile-menu button').forEach(el => {
     el.addEventListener('click', () => menu.classList.add('hidden'));
   });
+
 </script>
 </nav>
+
+

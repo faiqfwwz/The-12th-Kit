@@ -216,46 +216,52 @@ btnRefresh.addEventListener('click', () => location.reload());
 fetchProducts();
 document.addEventListener('productChanged', fetchProducts);
 
-/* ========= Navbar hook========= */
-(() => { pastik
-  const navBtn = document.getElementById('nav-create-product'); 
-  if (navBtn) {
-    navBtn.addEventListener('click', (e) => {
+/* ========= Navbar hook ========= */
+(() => {
+  document.querySelectorAll('[data-create-product]').forEach(el => {
+    el.addEventListener('click', (e) => {
       e.preventDefault();
-      showCreateProductModal();
+      if (typeof window.showCreateProductModal === 'function') {
+        window.showCreateProductModal();
+      } else {
+        (window.showToast ? showToast('error','Create modal not ready') : alert('Create modal not ready'));
+      }
     });
-  }
+  });
 })();
 
-window.showEditById = function(id) {
-    const prod = allProducts.find(p => String(p.id) === String(id));
-    if (!prod) {
-      (window.showToast ? showToast('error','Product not found') : alert('Product not found'));
-      return;
-    }
+window.showEditById = async function(id) {
+  // aman walau allProducts belum ada
+  let prod = (window.allProducts && Array.isArray(allProducts))
+             ? allProducts.find(p => String(p.id) === String(id))
+             : null;
 
-    const productForEdit = {
-      id: prod.id,
-      name: prod.name,
-      price: prod.price,
-      stock: prod.stock,
-      thumbnail: prod.thumbnail,
-      category: prod.category,           
-      brand: prod.brand,
-      league: prod.league,
-      team: prod.team,
-      season: prod.season,
-      description: prod.description,
-      is_featured: !!prod.is_featured
-    };
-
-    // fungsi ini didefinisikan global oleh modalcu.html
-    if (typeof window.showEditProductModal === 'function') {
-      window.showEditProductModal(productForEdit);
-    } else {
-      console.error('showEditProductModal is not defined (pastikan modalcu.html di-include sebelum script main)');
-      (window.showToast ? showToast('error','Edit modal not ready') : alert('Edit modal not ready'));
-    }
+  if (!prod) {
+    try {
+      const url = `{% url 'main:show_json_by_id' '00000000-0000-0000-0000-000000000000' %}`
+                  .replace('00000000-0000-0000-0000-000000000000', id);
+      const res = await fetch(url, { headers: { 'Accept':'application/json' }});
+      if (res.ok) prod = await res.json();
+    } catch {}
   }
+
+  if (!prod) {
+    (window.showToast ? showToast('error','Product not found') : alert('Product not found'));
+    return;
+  }
+
+  const productForEdit = {
+    id: prod.id, name: prod.name, price: prod.price, stock: prod.stock,
+    thumbnail: prod.thumbnail, category: prod.category,
+    brand: prod.brand, league: prod.league, team: prod.team, season: prod.season,
+    description: prod.description, is_featured: !!prod.is_featured
+  };
+
+  if (typeof window.showEditProductModal === 'function') {
+    window.showEditProductModal(productForEdit);
+  } else {
+    (window.showToast ? showToast('error','Edit modal not ready') : alert('Edit modal not ready'));
+  }
+};
 </script>
 {% endblock content %}
