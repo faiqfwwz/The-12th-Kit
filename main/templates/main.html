@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load humanize %}
 
 {% block meta %}
 <title>Football product</title>
@@ -8,67 +7,255 @@
 
 {% block content %}
 {% include 'navbar.html' %}
-
-<!-- MAIN: gelap -->
 <div class="bg-[#0A192F] w-full pt-16 min-h-screen">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
     <!-- Header Section -->
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-white mb-2">Fresh Off the Pitch</h1>
-      <p class="text-white/70">Never miss your club’s latest jersey.</p>
+    <div class="mb-6 flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-white mb-1">Fresh Off the Pitch</h1>
+        <p class="text-white/70">Never miss your club's latest jersey.</p>
+      </div>
+      <div class="flex gap-3">
+        <button onclick="showCreateProductModal()"
+                class="bg-[#00FF88] text-[#0A192F] px-4 py-2 rounded font-medium hover:bg-[#00e67b]">
+          + Add Product
+        </button>
+        <button id="btn-refresh"
+                class="bg-white/10 text-white/90 border border-white/10 px-4 py-2 rounded font-medium hover:bg-white/15">
+          Refresh
+        </button>
+      </div>
     </div>
 
-    <!-- Filter Section: dark card biar nyatu -->
+    <!-- Filter Section (dark card) -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 bg-[#10243F] rounded-lg border border-white/10 p-4">
       <div class="flex space-x-3 mb-4 sm:mb-0">
-        <a href="?"
-           class="px-4 py-2 rounded-md font-medium transition-colors
-           {% if request.GET.filter == 'all' or not request.GET.filter %}
-             bg-[#00FF88] text-[#0A192F]
-           {% else %}
-             bg-white/5 text-white/80 border border-white/10 hover:bg-white/10
-           {% endif %}">
-          All product
-        </a>
-
-        <a href="?filter=my"
-           class="px-4 py-2 rounded-md font-medium transition-colors
-           {% if request.GET.filter == 'my' %}
-             bg-[#00FF88] text-[#0A192F]
-           {% else %}
-             bg-white/5 text-white/80 border border-white/10 hover:bg-white/10
-           {% endif %}">
-          My product
-        </a>
+        <button id="filter-all" type="button"
+                class="px-4 py-2 rounded-md font-medium transition-colors bg-[#00FF88] text-[#0A192F] hover:bg-[#00e67b]">
+          All Products
+        </button>
+        <button id="filter-my" type="button"
+                class="px-4 py-2 rounded-md font-medium transition-colors bg-white/5 text-white/80 border border-white/10 hover:bg-white/10">
+          My Products
+        </button>
       </div>
-
       {% if user.is_authenticated %}
-        <div class="text-sm text-white/60">
-          Last login: {{ last_login }}
-        </div>
+        <div class="text-sm text-white/60">Last login: {{ last_login }}</div>
       {% endif %}
     </div>
 
-    <!-- Product Grid: 2 per baris -->
-    {% if not product_list %}
-      <div class="bg-[#10243F] rounded-lg border border-white/10 p-12 text-center text-white">
-        <div class="w-32 h-32 mx-auto mb-4 opacity-90">
-          <img src="{% static 'image/no-product.png' %}" alt="No product available" class="w-full h-full object-contain brightness-90">
-        </div>
-        <h3 class="text-lg font-medium mb-2">No product found</h3>
-        <p class="text-white/70 mb-6">Be the first to share football product with the community.</p>
-        <a href="{% url 'main:create_product' %}" class="inline-flex items-center px-4 py-2 bg-[#00FF88] text-[#0A192F] rounded-md hover:bg-[#00e67b] transition-colors">
-          Create product
-        </a>
-      </div>
-    {% else %}
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 auto-rows-[1fr] items-stretch">
-        {% for product in product_list %}
-            {% include 'card_product.html' with product=product %}
-        {% endfor %}
+    <!-- Loading State (dark) -->
+    <div id="loading" class="bg-[#10243F] rounded-lg border border-white/10 p-12 text-center hidden">
+      <svg class="animate-spin h-8 w-8 text-[#00FF88] inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+      </svg>
+      <p class="text-white/80 mt-3">Loading products...</p>
     </div>
-    {% endif %}
+
+    <!-- Error State -->
+    <div id="error" class="hidden text-red-300"></div>
+
+    <!-- Product Grid -->
+    <div id="grid" class="hidden"></div>
+
+    <!-- Empty State (dark) -->
+    <div id="empty" class="bg-[#10243F] rounded-lg border border-white/10 p-12 text-center hidden">
+      <div class="w-32 h-32 mx-auto mb-4 opacity-90">
+        <img src="{% static 'image/no-product.png' %}" alt="No product available" class="w-full h-full object-contain invert brightness-90">
+      </div>
+      <h3 class="text-lg font-medium text-white mb-2">No product found</h3>
+      <p class="text-white/70 mb-6">Be the first to share football product with the community.</p>
+      <button onclick="showCreateProductModal()" class="inline-flex items-center px-4 py-2 bg-[#00FF88] text-[#0A192F] rounded-md hover:bg-[#00e67b] transition-colors">
+        Create Product
+      </button>
+    </div>
   </div>
 </div>
+
+{# ==== INCLUDE modals ==== #}
+{% include 'modalcu.html' %}
+{% include 'modaldel.html' %}
+
+<script>
+/* ========= Config ========= */
+const PRODUCTS_API_ENDPOINT = "{% url 'main:show_json' %}";
+const CURRENT_USER_ID = "{{ user.id|default_if_none:'' }}";
+const IS_AUTH = "{{ user.is_authenticated|yesno:'1,0' }}" === "1";
+
+/* ========= DOM ========= */
+const loadingEl   = document.getElementById('loading');
+const errorEl     = document.getElementById('error');
+const emptyEl     = document.getElementById('empty');
+const gridEl      = document.getElementById('grid');
+const btnAll      = document.getElementById('filter-all');
+const btnMy       = document.getElementById('filter-my');
+const btnRefresh  = document.getElementById('btn-refresh');
+
+/* ========= State ========= */
+let activeFilter = 'all';
+let allProducts  = [];
+
+/* ========= Utils ========= */
+function setFiltersUI(){
+  if (activeFilter === 'all') {
+    btnAll.className = 'px-4 py-2 rounded-md font-medium transition-colors bg-[#00FF88] text-[#0A192F] hover:bg-[#00e67b]';
+    btnMy.className  = 'px-4 py-2 rounded-md font-medium transition-colors bg-white/5 text-white/80 border border-white/10 hover:bg-white/10';
+  } else {
+    btnMy.className  = 'px-4 py-2 rounded-md font-medium transition-colors bg-[#00FF88] text-[#0A192F] hover:bg-[#00e67b]';
+    btnAll.className = 'px-4 py-2 rounded-md font-medium transition-colors bg-white/5 text-white/80 border border-white/10 hover:bg-white/10';
+  }
+}
+function showSections({loading=false, error=false, empty=false, grid=false}){
+  loadingEl.classList.toggle('hidden', !loading);
+  errorEl.classList.toggle('hidden', !error);
+  emptyEl.classList.toggle('hidden', !empty);
+  gridEl.classList.toggle('hidden', !grid);
+  if (grid) {
+    gridEl.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 auto-rows-[1fr] items-stretch';
+  }
+}
+// fallback sanitizer kalau DOMPurify tidak ada
+function sanitize(s){ return (window.DOMPurify ? window.DOMPurify.sanitize(s) : String(s).replace(/[<>"']/g,'')); }
+
+/* ========= Build Card ========= */
+function buildProductCard(item){
+  const detailUrl = `{% url 'main:show_product' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', item.id);
+  const canEdit   = IS_AUTH && String(item.user_id || item.user) === String(CURRENT_USER_ID);
+
+  const name     = sanitize(item.name);
+  const team     = sanitize(item.team || '');
+  const catLabel = sanitize(item.category_label || item.category || '');
+  const thumb    = sanitize(item.thumbnail || '');
+  const priceText= Number(item.price || 0).toLocaleString('id-ID');
+
+  const editOnclick = `showEditById('${item.id}')`;
+  const delOnclick  = `openDeleteModal('${item.id}','${name.replace(/'/g,"\\'")}')`;
+
+  const el = document.createElement('article');
+  el.className = 'group relative h-full flex flex-col bg-white rounded-lg border border-[#E5E7EB] overflow-hidden hover:shadow-md transition';
+  el.innerHTML = `
+    <a href="${detailUrl}" class="relative block bg-[#F3F4F6]">
+      <div class="aspect-[3/4] w-full overflow-hidden">
+        ${
+          thumb
+            ? `<img src="${thumb}" alt="${name}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]">`
+            : `<div class="w-full h-full bg-[#F3F4F6]"></div>`
+        }
+      </div>
+    </a>
+
+    <div class="p-4 flex-1 flex flex-col">
+      <div class="text-xs text-gray-500 mb-1">
+        ${catLabel}${team ? ` · ${team}` : ``}
+      </div>
+
+      <h3 class="text-[15px] font-semibold text-[#0A192F] leading-snug mb-2 line-clamp-2">
+        <a href="${detailUrl}" class="hover:underline">${name}</a>
+      </h3>
+
+      <div class="mt-auto flex items-baseline gap-2">
+        <span class="text-[15px] font-semibold text-[#0A192F]">Rp. ${priceText}</span>
+      </div>
+    </div>
+
+    ${
+      canEdit
+        ? `<div class="px-4 pb-4">
+             <div class="flex items-center justify-end gap-3 pt-3 border-t border-[#E5E7EB]">
+               <button type="button" class="text-sm font-medium text-[#0A192F] hover:text-[#0A192F]/70" onclick="${editOnclick}">Edit</button>
+               <button type="button" class="text-sm font-medium text-red-600 hover:text-red-700" onclick="${delOnclick}">Delete</button>
+             </div>
+           </div>`
+        : ``
+    }
+  `;
+  return el;
+}
+
+/* ========= Render / Filter ========= */
+function renderGrid(list){
+  gridEl.innerHTML = '';
+  list.forEach(p => gridEl.appendChild(buildProductCard(p)));
+}
+function applyFilterAndDisplay(){
+  setFiltersUI();
+  const filtered = (activeFilter === 'all')
+    ? allProducts
+    : allProducts.filter(p => String(p.user_id || p.user) === String(CURRENT_USER_ID));
+
+  if (!filtered.length) { showSections({empty:true}); }
+  else { renderGrid(filtered); showSections({grid:true}); }
+}
+
+/* ========= Fetch ========= */
+async function fetchProducts(){
+  try{
+    showSections({loading:true});
+    const res  = await fetch(PRODUCTS_API_ENDPOINT, { headers:{'Accept':'application/json'} });
+    const text = await res.text();
+    const data = (()=>{ try{ return JSON.parse(text); } catch { return []; } })();
+    if(!res.ok) throw new Error('Bad status '+res.status);
+    allProducts = Array.isArray(data) ? data : (data.products || []);
+    applyFilterAndDisplay();
+  }catch(err){
+    console.error(err);
+    errorEl.textContent = 'Failed to load products from server.';
+    showSections({error:true});
+  }
+}
+
+/* ========= Events ========= */
+btnAll.addEventListener('click', ()=>{ activeFilter='all'; applyFilterAndDisplay(); });
+btnMy.addEventListener('click',  ()=>{ activeFilter='my';  applyFilterAndDisplay(); });
+btnRefresh.addEventListener('click', () => location.reload());
+
+
+/* ========= Init ========= */
+fetchProducts();
+document.addEventListener('productChanged', fetchProducts);
+
+/* ========= Navbar hook========= */
+(() => { pastik
+  const navBtn = document.getElementById('nav-create-product'); 
+  if (navBtn) {
+    navBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      showCreateProductModal();
+    });
+  }
+})();
+
+window.showEditById = function(id) {
+    const prod = allProducts.find(p => String(p.id) === String(id));
+    if (!prod) {
+      (window.showToast ? showToast('error','Product not found') : alert('Product not found'));
+      return;
+    }
+
+    const productForEdit = {
+      id: prod.id,
+      name: prod.name,
+      price: prod.price,
+      stock: prod.stock,
+      thumbnail: prod.thumbnail,
+      category: prod.category,           
+      brand: prod.brand,
+      league: prod.league,
+      team: prod.team,
+      season: prod.season,
+      description: prod.description,
+      is_featured: !!prod.is_featured
+    };
+
+    // fungsi ini didefinisikan global oleh modalcu.html
+    if (typeof window.showEditProductModal === 'function') {
+      window.showEditProductModal(productForEdit);
+    } else {
+      console.error('showEditProductModal is not defined (pastikan modalcu.html di-include sebelum script main)');
+      (window.showToast ? showToast('error','Edit modal not ready') : alert('Edit modal not ready'));
+    }
+  }
+</script>
 {% endblock content %}

@@ -12,3 +12,54 @@
     {% block content %} {% endblock content %}
   </body>
 </html>
+
+<!-- Toast container (global) -->
+<div id="toastHost" class="fixed top-4 right-4 z-[100] space-y-2"></div>
+
+
+<script>
+  // ===== Helpers umum =====
+  const REDIRECT_DELAY = 1200;        // jeda supaya toast terlihat
+  const TOAST_LIFE     = 1600;        // lama toast tampil
+
+  function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+  // Ganti isi tombol + disabled saat loading
+  function setLoading(btn, isLoading, labelWhenIdle) {
+    if (!btn) return;
+    btn.disabled = !!isLoading;
+    btn.classList.toggle('opacity-70', !!isLoading);
+    btn.classList.toggle('cursor-not-allowed', !!isLoading);
+    if (isLoading) {
+      btn.dataset.prev = btn.innerHTML;
+      btn.innerHTML =
+        `<span class="inline-flex items-center gap-2">
+          <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
+            <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" class="opacity-75"></path>
+          </svg>
+          ${labelWhenIdle || 'Processing...'}
+        </span>`;
+    } else if (btn.dataset.prev) {
+      btn.innerHTML = btn.dataset.prev;
+      delete btn.dataset.prev;
+    }
+  }
+
+  // Toast kecil pojok kanan atas
+  function showToast(type, message){
+    const host = document.getElementById('toastHost');
+    const el = document.createElement('div');
+    el.className = 'rounded-md shadow border px-4 py-3 text-sm flex items-center gap-2';
+    if(type==='success'){ el.classList.add('bg-emerald-50','border-emerald-200','text-emerald-800'); el.innerHTML='✅ <span>'+message+'</span>'; }
+    else if(type==='error'){ el.classList.add('bg-red-50','border-red-200','text-red-800'); el.innerHTML='⚠️ <span>'+message+'</span>'; }
+    else { el.classList.add('bg-gray-50','border-gray-200','text-gray-800'); el.innerHTML='ℹ️ <span>'+message+'</span>'; }
+    host.appendChild(el);
+    setTimeout(()=>{ el.style.transition='all .25s'; el.classList.add('opacity-0','-translate-y-1'); setTimeout(()=>el.remove(),250); },1800);
+  }
+  // CSRF helper 
+  function getCookie(n){
+    const v = `; ${document.cookie}`.split(`; ${n}=`); 
+    return v.length === 2 ? v.pop().split(';').shift() : '';
+  }
+</script>

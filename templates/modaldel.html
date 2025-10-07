@@ -1,0 +1,67 @@
+<div id="modalDel" class="hidden fixed inset-0 z-50 w-full flex items-center justify-center bg-black/60">
+  <div id="modalDelCard" class="bg-white border border-[#E5E7EB] rounded-xl w-[90%] max-w-md p-6 transform opacity-0 scale-95 transition">
+    <h3 class="text-lg font-semibold text-[#0A192F]">Delete Product</h3>
+    <p class="text-sm text-gray-600 mt-1">Are you sure you want to delete <span id="delName" class="font-medium"></span>?</p>
+
+    <div class="mt-6 flex gap-3 justify-end">
+      <button type="button" class="px-4 py-2 rounded border border-gray-300 text-gray-700 hover:bg-gray-50"
+              onclick="closeDeleteModal()">Cancel</button>
+      <button id="btnDelExec" type="button"
+              class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const DEL_ENDPOINT_TPL = "{% url 'main:delete_product_entry_ajax' '00000000-0000-0000-0000-000000000000' %}"; // butuh route ini
+
+  let _delId = null;
+
+  function openDeleteModal(id, name){
+    _delId = id;
+    document.getElementById('delName').textContent = name || '';
+    const m = document.getElementById('modalDel');
+    const c = document.getElementById('modalDelCard');
+    m.classList.remove('hidden');
+    setTimeout(()=>{ c.classList.remove('opacity-0','scale-95'); c.classList.add('opacity-100','scale-100'); }, 20);
+  }
+  function closeDeleteModal(){
+    const m = document.getElementById('modalDel');
+    const c = document.getElementById('modalDelCard');
+    c.classList.remove('opacity-100','scale-100');
+    c.classList.add('opacity-0','scale-95');
+    setTimeout(()=> m.classList.add('hidden'), 150);
+  }
+
+  async function execDelete(){
+    if(!_delId) return;
+    const btn = document.getElementById('btnDelExec');
+    btn.disabled = true; btn.classList.add('opacity-70','cursor-not-allowed');
+
+    const url = DEL_ENDPOINT_TPL.replace('00000000-0000-0000-0000-000000000000', _delId);
+    try{
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'X-Requested-With':'XMLHttpRequest' }
+      });
+      if(!res.ok){ throw new Error('delete-failed'); }
+      if (window.showToast) showToast('success','Product deleted');
+      document.dispatchEvent(new CustomEvent('productChanged'));
+      closeDeleteModal();
+    }catch(e){
+      console.error(e);
+      if (window.showToast) showToast('error','Failed to delete');
+    }finally{
+      btn.disabled = false; btn.classList.remove('opacity-70','cursor-not-allowed');
+      _delId = null;
+    }
+  }
+
+  document.getElementById('btnDelExec').addEventListener('click', execDelete);
+
+  if (!window.__productDeleteBound) {
+  document.getElementById('confirmDeleteBtn')?.addEventListener('click', handleDelete);
+  window.__productDeleteBound = true;
+}
+
+</script>

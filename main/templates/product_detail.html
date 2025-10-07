@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block meta %}
-<title>{{ product.name }} - The 12th Kit</title>
+<title>Product Detail - The 12th Kit</title>
 {% endblock meta %}
 
 {% block content %}
@@ -12,89 +12,187 @@
     <!-- Back Navigation -->
     <div class="mb-6">
       <a href="{% url 'main:show_main' %}" class="text-white/80 hover:text-white font-medium transition-colors">
-        ← Back to product
+        ← Back to Products
       </a>
     </div>
 
-    <!-- Product -->
-    <article class="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden">
+    <!-- Loading State (dark) -->
+    <div id="loading-state" class="bg-[#10243F] rounded-lg border border-white/10 p-12 text-center">
+      <svg class="animate-spin h-8 w-8 text-[#00FF88] inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+      </svg>
+      <p class="text-white/80 mt-3">Loading product detail...</p>
+    </div>
+
+    <!-- Error State (dark) -->
+    <div id="error-state" class="bg-[#10243F] rounded-lg border border-white/10 p-12 text-center hidden">
+      <div class="w-16 h-16 mx-auto mb-4">
+        <div class="text-[#ef4444] text-5xl">⚠️</div>
+      </div>
+      <h3 class="text-lg font-medium text-white mb-2">Failed to load product</h3>
+      <p class="text-white/70">Please try again later.</p>
+    </div>
+
+    <!-- Product Content (dark card) -->
+    <article id="product-content" class="bg-[#10243F] rounded-lg border border-white/10 overflow-hidden hidden">
 
       <!-- Header -->
       <div class="p-6 sm:p-8">
-        <div class="flex flex-wrap items-center gap-2 mb-4">
-          <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-[#00FF88] text-[#0A192F]">
-            {{ product.get_category_display }}
-          </span>
+        <div id="badges-container" class="flex flex-wrap items-center gap-2 mb-4"></div>
 
-          {% if product.is_featured %}
-          <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-yellow-100 text-yellow-800">
-            Featured
-          </span>
-          {% endif %}
+        <h1 id="product-title" class="text-3xl sm:text-4xl font-bold text-white leading-tight mb-4"></h1>
 
-          {% if product.season %}
-          <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700">
-            Season: {{ product.season }}
-          </span>
-          {% endif %}
-          {% if product.brand %}
-          <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700">
-            Brand: {{ product.brand }}
-          </span>
-          {% endif %}
-          {% if product.team %}
-          <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700">
-            Team: {{ product.team }}
-          </span>
-          {% endif %}
-          {% if product.league %}
-          <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700">
-            {{ product.league }}
-          </span>
-          {% endif %}
-        </div>
-
-        <h1 class="text-3xl sm:text-4xl font-bold text-[#0A192F] leading-tight mb-4">
-          {{ product.name|default:"Unnamed Product" }}
-        </h1>
-
-        <div class="flex flex-wrap items-center text-sm text-gray-600 gap-4">
-          <span>Price: <span class="font-semibold">Rp {{ product.price }}</span></span>
-          <span>Stock: <span class="font-semibold">{{ product.stock }}</span></span>
+        <div class="flex flex-wrap items-center text-sm text-white/70 gap-4">
+          <span id="product-price"></span>
+          <span class="mx-1 hidden sm:inline">•</span>
+          <span id="product-stock"></span>
         </div>
       </div>
 
-      {% if product.thumbnail %}
-      <div class="px-6 sm:px-8">
-        <img src="{{ product.thumbnail }}" alt="{{ product.name|default:'Product image' }}"
-             class="w-full h-64 sm:h-80 lg:h-96 object-cover rounded-lg">
+      <!-- Featured Image -->
+      <div id="featured-image-container" class="hidden -mx-6 sm:-mx-8">
+        <img id="featured-image"
+            src=""
+            alt=""
+            class="block w-full h-auto">
       </div>
-      {% endif %}
 
+      <!-- Description -->
       <div class="p-6 sm:p-8">
-        <div class="prose prose-lg max-w-none">
-          <div class="text-gray-700 leading-relaxed whitespace-pre-line text-base sm:text-lg">
-            {{ product.description|default:"No description yet." }}
-          </div>
+        <div class="prose prose-invert prose-lg max-w-none">
+          <div id="product-description" class="text-white/85 leading-relaxed whitespace-pre-line text-base sm:text-lg"></div>
         </div>
       </div>
 
-      <div class="border-t border-[#E5E7EB] p-6 sm:p-8 bg-[#F9FAFB]">
+      <!-- Author Info -->
+      <div class="border-t border-white/10 p-6 sm:p-8 bg-[#0F1E36]">
         <div class="flex items-center justify-between">
           <div>
-            <div class="font-medium text-[#0A192F]">
-              {% if product.user %}
-                <p>Author: {{ product.user.username }}</p>
-              {% else %}
-                <p>Author: Anonymous</p>
-              {% endif %}
+            <div class="font-medium text-white">
+              <p id="product-author">Author: Loading...</p>
             </div>
-            <p class="text-sm text-gray-500">Author</p>
+            <p class="text-sm text-white/60">Author</p>
           </div>
         </div>
       </div>
-
     </article>
   </div>
 </div>
+
+<script>
+// ===== Config =====
+const PRODUCT_ID = "{{ product.id }}";
+const PRODUCT_DETAIL_ENDPOINT =
+  `{% url 'main:show_json_by_id' '00000000-0000-0000-0000-000000000000' %}`.replace(
+    '00000000-0000-0000-0000-000000000000', PRODUCT_ID
+  );
+
+// ===== DOM =====
+const loadingState = document.getElementById('loading-state');
+const errorState = document.getElementById('error-state');
+const productContent = document.getElementById('product-content');
+const badgesContainer = document.getElementById('badges-container');
+const productTitle = document.getElementById('product-title');
+const productPrice = document.getElementById('product-price');
+const productStock = document.getElementById('product-stock');
+const featuredImageContainer = document.getElementById('featured-image-container');
+const featuredImage = document.getElementById('featured-image');
+const productDescription = document.getElementById('product-description');
+const productAuthor = document.getElementById('product-author');
+
+// ===== State switcher =====
+function showState(state) {
+  loadingState.classList.toggle('hidden', state !== 'loading');
+  errorState.classList.toggle('hidden', state !== 'error');
+  productContent.classList.toggle('hidden', state !== 'ready');
+}
+
+// ===== Category label =====
+function getCategoryLabel(code) {
+  const map = {
+    club_home: 'Club • Home',
+    club_away: 'Club • Away',
+    club_third: 'Club • Third',
+    club_gk: 'Club • Goalkeeper',
+    club_special: 'Club • Special/Anniv',
+    national_home: 'National • Home',
+    national_away: 'National • Away',
+    national_third: 'National • Third',
+    national_gk: 'National • Goalkeeper',
+    national_special: 'National • Special/Anniv',
+    retro: 'Retro/Classic',
+    limited: 'Limited Edition',
+  };
+  return map[code] || code;
+}
+
+// ===== Render =====
+function renderProduct(p) {
+  // Title & <title>
+  productTitle.textContent = p.name || 'Unnamed Product';
+  document.title = `${p.name || 'Product'} - The 12th Kit`;
+
+  // Badges
+  badgesContainer.innerHTML = '';
+  const cat = document.createElement('span');
+  cat.className = 'inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-[#00FF88] text-[#0A192F]';
+  cat.textContent = getCategoryLabel(p.category);
+  badgesContainer.appendChild(cat);
+
+  if (p.is_featured) {
+    const feat = document.createElement('span');
+    feat.className = 'inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-yellow-200/90 text-[#0A192F]';
+    feat.textContent = 'Featured';
+    badgesContainer.appendChild(feat);
+  }
+
+  [['Season', p.season], ['Brand', p.brand], ['Team', p.team], ['League', p.league]].forEach(([label, val])=>{
+    if (val) {
+      const tag = document.createElement('span');
+      tag.className = 'inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-white/10 text-white/80';
+      tag.textContent = `${label}: ${val}`;
+      badgesContainer.appendChild(tag);
+    }
+  });
+
+  // Price & Stock
+  productPrice.textContent = `Price: Rp ${Number(p.price || 0).toLocaleString('id-ID')}`;
+  productStock.textContent = `Stock: ${p.stock ?? 0}`;
+
+  // Thumbnail
+  if (p.thumbnail) {
+    featuredImage.src = p.thumbnail;
+    featuredImage.alt = p.name || 'Product image';
+    featuredImageContainer.classList.remove('hidden');
+  } else {
+    featuredImageContainer.classList.add('hidden');
+  }
+
+  // Description
+  productDescription.textContent = p.description || 'No description yet.';
+
+  // Author
+  const authorName = p.user_username || 'Anonymous';
+  productAuthor.textContent = `Author: ${authorName}`;
+}
+
+// ===== Fetch detail =====
+async function loadProductDetail() {
+  try {
+    showState('loading');
+    const res = await fetch(PRODUCT_DETAIL_ENDPOINT, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error('Failed to fetch product detail');
+    const data = await res.json();
+    renderProduct(data);
+    showState('ready');
+  } catch (e) {
+    console.error(e);
+    showState('error');
+  }
+}
+
+// Init
+loadProductDetail();
+</script>
 {% endblock content %}

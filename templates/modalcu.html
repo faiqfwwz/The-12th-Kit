@@ -1,0 +1,321 @@
+<!-- Overlay -->
+<div id="crudModal"
+     class="hidden fixed inset-0 z-50 w-full flex items-center justify-center
+            bg-[#0A192F]/70 backdrop-blur-[2px]">
+
+  <!-- Modal Card -->
+  <div id="crudModalContent"
+       class="bg-white rounded-xl shadow-xl w-5/6 sm:w-3/5 md:w-1/2 lg:w-2/5 xl:w-1/3
+              max-h-[90vh] overflow-y-auto transform transition-all duration-150
+              opacity-0 scale-95 border border-[#E5E7EB]">
+
+    <!-- Header -->
+    <div class="flex items-start justify-between p-5 border-b border-[#E5E7EB]">
+      <div>
+        <h3 id="modalTitle" class="text-xl font-semibold text-[#0A192F]">
+          Add Product
+        </h3>
+        <p id="modalSubtitle" class="text-sm text-gray-600 mt-1">
+          Masukkan detail jersey/produk untuk ditampilkan di toko
+        </p>
+      </div>
+      <button type="button"
+              class="text-gray-400 hover:text-[#0A192F] hover:bg-gray-100 rounded-lg p-2"
+              onclick="hideModal()">
+        <span class="sr-only">Close</span>
+        <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd"
+           d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414 5.707 15.707a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+           clip-rule="evenodd"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="px-6 py-5 form-style">
+      <form id="productForm" class="space-y-4">
+        {% csrf_token %}
+        <!-- hidden id untuk mode edit -->
+        <input type="hidden" id="product_id" name="id">
+
+        <div>
+          <label for="name" class="block text-sm font-medium text-[#0A192F]">Name</label>
+          <input id="name" name="name" type="text" required
+                 placeholder="e.g. Jersey Home FC Barcelona 25/26"
+                 class="mt-1 block w-full px-3 py-2 border-2 border-[#E5E7EB] rounded-md
+                        focus:outline-none focus:border-[#00FF88] focus:ring-2 focus:ring-[#00FF88]/30">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="price" class="block text-sm font-medium text-[#0A192F]">Price (Rp)</label>
+            <input id="price" name="price" type="number" min="0" required
+                   placeholder="1200000"
+                   class="mt-1 block w-full px-3 py-2 border-2 border-[#E5E7EB] rounded-md
+                          focus:outline-none focus:border-[#00FF88] focus:ring-2 focus:ring-[#00FF88]/30">
+          </div>
+          <div>
+            <label for="stock" class="block text-sm font-medium text-[#0A192F]">Stock</label>
+            <input id="stock" name="stock" type="number" min="0" required
+                   placeholder="100"
+                   class="mt-1 block w-full px-3 py-2 border-2 border-[#E5E7EB] rounded-md
+                          focus:outline-none focus:border-[#00FF88] focus:ring-2 focus:ring-[#00FF88]/30">
+          </div>
+        </div>
+
+        <div>
+          <label for="thumbnail" class="block text-sm font-medium text-[#0A192F]">Thumbnail URL</label>
+          <input id="thumbnail" name="thumbnail" type="url"
+                 placeholder="https://example.com/image.jpg"
+                 class="mt-1 block w-full px-3 py-2 border-2 border-[#E5E7EB] rounded-md
+                        focus:outline-none focus:border-[#00FF88] focus:ring-2 focus:ring-[#00FF88]/30">
+        </div>
+
+        <div>
+          <label for="category" class="block text-sm font-medium text-[#0A192F]">Category</label>
+          <select id="category" name="category" required
+                  class="mt-1 block w-full px-3 py-2 border-2 border-[#E5E7EB] rounded-md
+                         bg-white focus:outline-none focus:border-[#00FF88] focus:ring-2 focus:ring-[#00FF88]/30">
+            <option value="">Choose a category</option>
+            <option value="club_home">Club • Home</option>
+            <option value="club_away">Club • Away</option>
+            <option value="club_third">Club • Third</option>
+            <option value="club_gk">Club • Goalkeeper</option>
+            <option value="club_special">Club • Special/Anniv</option>
+            <option value="national_home">National • Home</option>
+            <option value="national_away">National • Away</option>
+            <option value="national_third">National • Third</option>
+            <option value="national_gk">National • Goalkeeper</option>
+            <option value="national_special">National • Special/Anniv</option>
+            <option value="retro">Retro/Classic</option>
+            <option value="limited">Limited Edition</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="brand" class="block text-sm font-medium text-[#0A192F]">Brand</label>
+            <input id="brand" name="brand" type="text" placeholder="Nike / Adidas / dll"
+                   class="mt-1 block w-full px-3 py-2 border-2 border-[#E5E7EB] rounded-md
+                          focus:outline-none focus:border-[#00FF88] focus:ring-2 focus:ring-[#00FF88]/30">
+          </div>
+          <div>
+            <label for="league" class="block text-sm font-medium text-[#0A192F]">League</label>
+            <input id="league" name="league" type="text" placeholder="La Liga / Premier League / dll"
+                   class="mt-1 block w-full px-3 py-2 border-2 border-[#E5E7EB] rounded-md
+                          focus:outline-none focus:border-[#00FF88] focus:ring-2 focus:ring-[#00FF88]/30">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="team" class="block text-sm font-medium text-[#0A192F]">Team</label>
+            <input id="team" name="team" type="text" placeholder="FC Barcelona / Indonesia"
+                   class="mt-1 block w-full px-3 py-2 border-2 border-[#E5E7EB] rounded-md
+                          focus:outline-none focus:border-[#00FF88] focus:ring-2 focus:ring-[#00FF88]/30">
+          </div>
+          <div>
+            <label for="season" class="block text-sm font-medium text-[#0A192F]">Season</label>
+            <input id="season" name="season" type="text" placeholder="2025/26"
+                   class="mt-1 block w-full px-3 py-2 border-2 border-[#E5E7EB] rounded-md
+                          focus:outline-none focus:border-[#00FF88] focus:ring-2 focus:ring-[#00FF88]/30">
+          </div>
+        </div>
+
+        <div>
+          <label for="description" class="block text-sm font-medium text-[#0A192F]">Description</label>
+          <textarea id="description" name="description" rows="4" required
+                    placeholder="Deskripsi produk..."
+                    class="mt-1 block w-full px-3 py-2 border-2 border-[#E5E7EB] rounded-md
+                           focus:outline-none focus:border-[#00FF88] focus:ring-2 focus:ring-[#00FF88]/30"></textarea>
+        </div>
+
+        <div class="pt-1">
+          <label class="inline-flex items-center gap-2 select-none cursor-pointer">
+            <input id="is_featured" name="is_featured" type="checkbox"
+                   class="w-5 h-5 border-2 border-[#E5E7EB] rounded
+                          focus:outline-none focus:border-[#00FF88]">
+            <span class="text-sm text-[#0A192F]">Featured Product</span>
+          </label>
+        </div>
+
+        <!-- error text -->
+        <div id="productFormErrors" class="text-sm text-red-600"></div>
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex flex-col sm:flex-row gap-4 p-6 border-t border-[#E5E7EB]">
+      <button type="button"
+              class="order-2 sm:order-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-md font-medium
+                     hover:bg-gray-50 transition-colors text-center"
+              onclick="hideModal()">
+        Cancel
+      </button>
+
+      <button id="submitProductBtn" type="submit" form="productForm"
+              class="order-1 sm:order-2 flex-1 bg-[#00FF88] text-[#0A192F] px-6 py-3 rounded-md font-medium
+                     hover:bg-[#00e67b] transition-colors">
+        Add Product
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ===== Helpers =====
+  function getCookie(n){const v=`; ${document.cookie}`.split(`; ${n}=`);return v.length===2?v.pop().split(';').shift():''}
+  function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+  function setBtnLoading(btn,on,label){
+    if(!btn) return;
+    btn.disabled = !!on;
+    if(on){
+      btn.dataset.prev = btn.innerHTML;
+      btn.classList.add('opacity-70','cursor-not-allowed');
+      btn.innerHTML = `<span class="inline-flex items-center gap-2">
+        <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle>
+          <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" class="opacity-75"></path>
+        </svg>${label||'Saving...'}</span>`;
+    } else {
+      btn.classList.remove('opacity-70','cursor-not-allowed');
+      if(btn.dataset.prev){ btn.innerHTML = btn.dataset.prev; delete btn.dataset.prev; }
+    }
+  }
+  function toastOk(msg){ window.showToast ? showToast('success', msg) : alert(msg); }
+  function toastErr(msg){ window.showToast ? showToast('error', msg) : alert(msg); }
+
+  // ===== Modal control =====
+  function showModal(){
+    const m = document.getElementById('crudModal');
+    const c = document.getElementById('crudModalContent');
+    m.classList.remove('hidden');
+    // next-tick anim
+    setTimeout(()=>{ c.classList.remove('opacity-0','scale-95'); c.classList.add('opacity-100','scale-100'); }, 20);
+  }
+  function hideModal(){
+    const m = document.getElementById('crudModal');
+    const c = document.getElementById('crudModalContent');
+    c.classList.remove('opacity-100','scale-100');
+    c.classList.add('opacity-0','scale-95');
+    setTimeout(()=> m.classList.add('hidden'), 150);
+  }
+
+  // ===== Mode setup (Create / Edit) =====
+  function setProductModalMode(mode='create', product=null){
+    const title = document.getElementById('modalTitle');
+    const subtitle = document.getElementById('modalSubtitle');
+    const btn = document.getElementById('submitProductBtn');
+    const form = document.getElementById('productForm');
+    form.reset();
+    document.getElementById('product_id').value = '';
+
+    if(mode==='edit' && product){
+      title.textContent = 'Edit Product';
+      subtitle.textContent = 'Perbarui detail jersey/produk kamu';
+      btn.textContent = 'Update Product';
+      // isi field
+      document.getElementById('product_id').value = product.id || '';
+      document.getElementById('name').value = product.name || '';
+      document.getElementById('price').value = product.price ?? '';
+      document.getElementById('stock').value = product.stock ?? '';
+      document.getElementById('thumbnail').value = product.thumbnail || '';
+      document.getElementById('category').value = product.category || '';
+      document.getElementById('brand').value = product.brand || '';
+      document.getElementById('league').value = product.league || '';
+      document.getElementById('team').value = product.team || '';
+      document.getElementById('season').value = product.season || '';
+      document.getElementById('description').value = product.description || '';
+      document.getElementById('is_featured').checked = !!product.is_featured;
+      form.dataset.mode = 'edit';
+    } else {
+      title.textContent = 'Add Product';
+      subtitle.textContent = 'Masukkan detail jersey/produk untuk ditampilkan di toko';
+      btn.textContent = 'Add Product';
+      form.dataset.mode = 'create';
+    }
+  }
+
+  // ===== Submit handler (AJAX) =====
+  async function submitProduct(e){
+    e.preventDefault();
+    const form = document.getElementById('productForm');
+    const btn  = document.getElementById('submitProductBtn');
+    const errBox = document.getElementById('productFormErrors');
+    errBox.textContent = '';
+
+    const mode = form.dataset.mode || 'create';
+    const id   = document.getElementById('product_id').value;
+
+    const fd = new FormData(form);
+    if(!document.getElementById('is_featured').checked){ fd.set('is_featured', ''); }
+
+    let url = "";
+    if(mode === 'edit' && id){
+      url = "{% url 'main:edit_product_entry_ajax' '00000000-0000-0000-0000-000000000000' %}".replace('00000000-0000-0000-0000-000000000000', id);
+    } else {
+      url = "{% url 'main:add_product_entry_ajax' %}";
+    }
+
+    setBtnLoading(btn, true, mode==='edit' ? 'Updating…' : 'Saving…');
+    const t0 = performance.now();
+    const MIN_SPIN = 600;
+
+    try{
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'X-Requested-With':'XMLHttpRequest',
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: fd
+      });
+
+      const isJson = res.headers.get('content-type')?.includes('application/json');
+      const data = isJson ? await res.json() : null;
+
+      const elapsed = performance.now() - t0;
+      if(elapsed < MIN_SPIN) await wait(MIN_SPIN - elapsed);
+
+      if(!res.ok || (data && data.ok === false)){
+        const msg = data?.errors
+          ? Object.entries(data.errors).map(([k,v]) => `${k}: ${Array.isArray(v)?v.join(', '):v}`).join(' • ')
+          : `Failed (${res.status})`;
+        toastErr(msg);
+        return;
+      }
+
+      toastOk(mode==='edit' ? 'Product updated' : 'Product added');
+      form.reset();
+      hideModal();
+      document.dispatchEvent(new CustomEvent('productChanged'));
+    }catch(err){
+      const elapsed = performance.now() - t0;
+      if(elapsed < MIN_SPIN) await wait(MIN_SPIN - elapsed);
+      console.error(err);
+      toastErr('Network error');
+    }finally{
+      setBtnLoading(btn, false);
+    }
+  }
+
+  document.getElementById('productForm').addEventListener('submit', submitProduct);
+
+  // ===== API publik =====
+  // showCreateProductModal()
+  window.showCreateProductModal = function(){
+    setProductModalMode('create');
+    showModal();
+  }
+  // showEditProductModal(productObj)
+  // productObj minimal: { id, name, price, stock, thumbnail, category, brand, league, team, season, description, is_featured }
+  window.showEditProductModal = function(product){
+    setProductModalMode('edit', product);
+    showModal();
+  }
+
+  if (!window.__productModalBound) {
+  document.getElementById('productForm')?.addEventListener('submit', submitProduct);
+  window.__productModalBound = true;
+}
+</script>
