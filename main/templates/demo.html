@@ -1,0 +1,52 @@
+<!-- DEMO TUGAS 5
+di dalem html baru (html ini ga di connect dan ga di run pake django, jadi dijalanin sendiri as a html file aja). bikin navbar yang kaya gini:
+di navbarnya kebagi 2 "kelompok", ada kelompok yang di kanan dan ada kelompok yang di kiri. 
+Kelompok kiri isinya ada logo (ambil image address dari google aja) & setelahnya ada judul website
+Kelompok kanan isinya text Home, About, sama Contact
+Kelompok kanan kepisah sama kelompok kiri, jadi ada space kosong di antara mereka -->
+
+<html>
+    <head>
+        <title>Demo</title>
+        <style>
+            #nav-kiri {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+            }
+
+            #nav-kanan {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .logo {
+                width: 42px;
+                height: 42px;
+            }
+
+            #navbar {
+                position: sticky;
+                top: 0;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        </style>
+    </head>
+
+    <body>
+        <nav id="navbar">
+            <div id = "nav-kiri">
+                <img class = "logo" src="https://upload.wikimedia.org/wikipedia/en/thumb/4/47/FC_Barcelona_%28crest%29.svg/230px-FC_Barcelona_%28crest%29.svg.png"/>
+                <span class= "brand">FC Barcelona</span>
+            </div>
+            <div id = "nav-kanan">
+                <a class = "home" href="home">Home</a>
+                <a class = "about" href="about">About</a>
+                <a class = "contact" href="contact">Contact</a>
+            </div>
+        </nav>
+    </body>
+</html>

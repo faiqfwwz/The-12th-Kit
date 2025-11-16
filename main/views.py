@@ -1,6 +1,4 @@
 import json
-import traceback
-from django.forms import ValidationError
 from django.shortcuts import render, redirect, get_object_or_404
 from main.forms import ProductForm
 from main.models import Product
@@ -16,6 +14,8 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.contrib.auth.models import User
+import requests
+from django.utils.html import strip_tags
 
 # Create your views here.
 
@@ -331,9 +331,80 @@ def edit_product_entry_ajax(request, product_id):
 @csrf_exempt
 @require_POST
 def delete_product_entry_ajax(request, product_id):
-  product = get_object_or_404(Product, pk=product_id)
+    product = get_object_or_404(Product, pk=product_id)
 
-  if product.user_id and request.user.is_authenticated and product.user_id != request.user.id:
-      return HttpResponseForbidden(b"FORBIDDEN")
-  product.delete()
-  return HttpResponse(b"DELETED", status=200)
+    if product.user_id and request.user.is_authenticated and product.user_id != request.user.id:
+        return HttpResponseForbidden(b"FORBIDDEN")
+    product.delete()
+    return HttpResponse(b"DELETED", status=200)
+
+def proxy_image(request):
+    image_url = request.GET.get('url')
+    if not image_url:
+        return HttpResponse('No URL provided', status=400)
+    
+    try:
+        # Fetch image from external source
+        response = requests.get(image_url, timeout=10)
+        response.raise_for_status()
+        
+        # Return the image with proper content type
+        return HttpResponse(
+            response.content,
+            content_type=response.headers.get('Content-Type', 'image/jpeg')
+        )
+    except requests.RequestException as e:
+        return HttpResponse(f'Error fetching image: {str(e)}', status=500)
+    
+@csrf_exempt
+def create_product_flutter(request):
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            return JsonResponse({"status": "error", "message": "User not authenticated"}, status=401)
+
+        data = json.loads(request.body)
+
+        name = strip_tags(data.get("name", ""))
+        description = strip_tags(data.get("description", ""))
+        thumbnail = data.get("thumbnail", "") or ""
+        category = data.get("category", "club_home")
+        is_featured = data.get("is_featured", False)
+        brand = strip_tags(data.get("brand", ""))
+        league = strip_tags(data.get("league", ""))
+        team = strip_tags(data.get("team", ""))
+        season = strip_tags(data.get("season", ""))
+
+        try:
+            price = int(data.get("price", 0))
+            stock = int(data.get("stock", 0))
+        except ValueError:
+            return JsonResponse({"status": "error", "message": "Price and stock must be numbers"}, status=400)
+
+        if not name:
+            return JsonResponse({"status": "error", "message": "Name is required"}, status=400)
+
+        if price < 0:
+            return JsonResponse({"status": "error", "message": "Price cannot be negative"}, status=400)
+
+        if stock < 0:
+            return JsonResponse({"status": "error", "message": "Stock cannot be negative"}, status=400)
+
+        product = Product(
+            name=name,
+            price=price,
+            description=description,
+            thumbnail=thumbnail,
+            category=category,
+            is_featured=is_featured,
+            stock=stock,
+            brand=brand,
+            league=league,
+            team=team,
+            season=season,
+            user=request.user,
+        )
+        product.save()
+
+        return JsonResponse({"status": "success", "message": "Product created"}, status=200)
+
+    return JsonResponse({"status": "error", "message": "Invalid method"}, status=405)
